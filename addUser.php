@@ -9,9 +9,9 @@ if ($email && $lastName && $firstName && $password1 && $password2) {
     else if (strlen($password1) < 8 && $userId < 1)
         die("<h1><font color='red'>$userId passwords missing or invalid $password1</font></h1>");
     
-$sql="usp_save_user(0, '$userName','$email','$lastName', '$firstName','415-555-1212','12345',"
+    $sql="usp_save_user(0, '$userName','$email','$lastName', '$firstName','415-555-1212','12345',"
             . "'$password1','$password2',1,'$userName')";
-echo $sql;
+//echo $sql;
     $dao = new Database(1);
    // extract($dao->call($sql)->fetch());
     extract($dao->call($sql)->fetch());

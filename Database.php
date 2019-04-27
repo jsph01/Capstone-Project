@@ -12,7 +12,7 @@ class Database {
     private $stmt = null;
     private $os = "LIN";
     private $local = false;
-    private $dbType=2;
+    private $dbType=1;
     
     public function __construct($args = null) {
         // echo "db constructor";

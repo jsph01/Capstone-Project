@@ -11,92 +11,103 @@
                 <script src='scripts/ajax.js'></script>
                 <script src='scripts/validate.js'></script>
                 <script type="text/javascript">
-                    var userOk = false;//Flag set to false until ajax call returns 'Available'
-                    function callServer(url)
-                    {
-                        $.get(url,
-                                function (retval) {
-                                    return retval;
-                                });
-                    }
-                    /*
-                     * lost focus even on new username.
-                     * Ajax call to query users table based on entered username.
-                     */
+                    var userOk = false;
                     function availUser(fld)
                     {
                         var val = fld.value;
+                        //alert(val);
                         json("ajax.php?id=1&username=" + val, availUser_Callback);
                     }
-                    /* callback function from above. 
-                     * If msg=='Available' username not taken and may be used.
-                     */
                     function availUser_Callback(msg)
                     {
-                        if (msg === "Available") {// Not found in user table and may be used.
+                        //alert(msg);
+                        if (msg === "Available") {
                             userOk = true;
                             $("#userOk").val("1");
                             $("#userStatus").html("<font color='green'>" + msg + "</font>");
-                        } else {// Found in database and may not be used.
+                        } else {
                             userOk = false;
                             $("#userOk").val("0");
                             $("#userStatus").html("<font color='red'>" + msg + "</font>");
                             $("#userName").focus();
                         }
                     }
+                    function validateYear(fld)
+                    {
+                        var y = parseInt(fld.value);
+                        if (y > 1800 && y < 2011)
+                            return true;
+                        return true;
+                        //************      alert("Invalid Year");
+                        fld.focus();
+                        return true;
+                        //return;
+                    }
+                    function validateDay(fld)
+                    {
+                        var d = parseInt(fld.value);
+                        if (d > 0 && d < 29)
+                            return true;
 
+                        var m = document.frmAddUser.month.selectedIndex;
+                        switch (m) {
+                            case 3: // April
+                            case 5: // June
+                            case 8: // Sept.
+                            case 10: // Oct.
+                                if (d < 31)
+                                    return true;
+                                break;
+                            case 1:  // Feb.
+                                if (d < 29)
+                                    return true;
+                                else if (d > 29)
+                                    break;
 
-                    // fields on form to validate
-                    var fields = ['userName', 'lastName', 'firstName', 'email', 'password1']
-                    var names = ['User Name', 'Last Name', 'First Name', 'Email', 'Password'];
+                                var y = document.frmAddUser.year.value;
+                                if (y % 4 == 0 && y != 2000)
+                                    return true;
+                                // Leap year?
+                                break;
+                            default: // All other months have 31 days.
+                                if (d < 32)
+                                    return true;
+                        }
+                        alert("Invalid Day");
+                        fld.focus();
+                        return;
+                    }
+                    function form_SubmitOld(frm)
+                    {
+                        if (!validateDay(frm.day))
+                            return false;
+
+                        return true;
+                    }
+
+                    var fields = ['userName','lastName','firstName','email','password1']
+                    var names = ['User Name','Last Name', 'First Name', 'Email', 'Password'];
 
                     function form_Submit(frm)
                     {
-                        if (!userOk)//if ajax server call returns 'Available'
+                        if (!userOk)
                         {
-                            if (frm.lastName.value !== "")
-                            {//if form last name is entered but userOk is false probably
-                                // because back button was hit from save page.
-                                // Make Ajax call to validate
-                                $.get("ajax.php?id=1&username=" + frm.userName.value,
-                                        function (data) {
-                                            if (data !== "Available")
-                                            {
-                                                alert("Invalid user name");
-                                                return false;
-                                            }
-                                        });
-                            } else {
-                                alert("Invalid user name");
-                                return false;
-                            }
+                            alert("Invalid user name");
+                            return false;
                         }
-                        //validate all fields on form.  scripts/validate is in validate.js
+
                         var errors = validate(fields, names);
-                        if (errors.length > 0)//errors found, loop through and display in message div.
+                        if (errors.length > 0)
                         {
                             var msg = "<font color='red'><b><u>Errors:</u></b><br/>";
                             for (var i in errors)
                                 msg += errors[i] + " required field.<br/>";
                             //alert(msg);
-                            $("#userStatus").html(msg + "</font>");
-                            return false;
-                        }
-
-                        // basic validation on passwords equal and at least 8 characters.
-                        if (frm.password1.value !== frm.password2.value)
-                        {
-                            $("#userStatus").html("<font color='red'>Passwords don't match!</font>");
-                            return false;
-                        } else if ((frm.password1.value + "").length < 8)
-                        {
-                            $("#userStatus").html("<font color='red'>Passwords must be at least 8 characters!</font>");
-
+                            $("#userStatus").html(msg+"</font>");
                             return false;
                         }
                         return true;
                     }
-
                     function forgot()
                     {
                         var email = prompt("Enter email to retrieve account information:");
@@ -156,7 +167,7 @@
                         left: 240px;  
                     }
                     a{color:white;}
-
+                    
                     .divInput{
                         height:25px;
                     }
@@ -189,7 +200,7 @@
                             </div>
                             <div> <span class='forgot'><a href='javascript:forgot()'>Forgot Account?</a></span></div>
                         </div>  
-
+                        
                         <div id="divAddUser" class="divNewUserForm">
                             <form method="post" action="addUser.php" name="frmAddUser" onsubmit="return form_Submit(this)">
                                 <input type="hidden" name="userOk" id="userOk" value="0"/>

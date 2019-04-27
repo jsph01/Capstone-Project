@@ -9,7 +9,7 @@ if ($email && $lastName && $firstName && $username) {
         die("<h1><font color='red'>$userId passwords missing or invalid</font></h1>");
     $sql = "usp_save_user($userId, '$userName','$email','$lastName', '$firstName','415-555-1212','12345',"
             . "'$password1','$password2',1,'$userName')";
-echo $sql;
+//echo $sql;
     $dao = new Database(1);
     extract($dao->call($sql)->fetch());
 
